@@ -21,5 +21,3 @@ FactoryBot.define do
         email: 'test2@example.com'
   end
 end
-
-# dammy push (branch #2)
