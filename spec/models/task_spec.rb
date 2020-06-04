@@ -12,12 +12,14 @@ RSpec.describe Task, type: :model do
     it `is invalid without title` do
       @task = FactoryBot.build(:task, title: '')
       expect(@task.valid?).to eq(false)
+      expect(@task.errors[:title]).to include("can't be blank")
     end
     
     # 状態が未入力であれば、タスク登録できないこと
     it `is invalid without status` do
       @task = FactoryBot.build(:task, status: '')
       expect(@task.valid?).to eq(false)
+      expect(@task.errors[:status]).to include("can't be blank")
     end
   end
   
