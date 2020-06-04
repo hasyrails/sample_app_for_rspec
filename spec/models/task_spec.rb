@@ -1,5 +1,41 @@
 require 'rails_helper'
 
 RSpec.describe Task, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  describe 'validation check (presence:true)' do
+    # タイトル(title)と状態(status)が入力されていればタスク登録できること
+    it 'is valid with title, status' do
+      @task = FactoryBot.build(:task, content: '', deadline: '')
+      expect(@task).to be_valid
+    end
+    
+    # タイトルが未入力であれば、タスク登録できないこと
+    it `is invalid without title` do
+      @task = FactoryBot.build(:task, title: '')
+      expect(@task.valid?).to eq(false)
+    end
+    
+    # 状態が未入力であれば、タスク登録できないこと
+    it `is invalid without status` do
+      @task = FactoryBot.build(:task, status: '')
+      expect(@task.valid?).to eq(false)
+    end
+  end
+  
+  describe 'validation check (uniqueness: true)' do
+    # 登録済のタイトルと同じタイトルでタスク登録できないこと
+    it 'is invalid with a duplicate task title' do
+      @task = FactoryBot.create(
+        :task, 
+        title: 'スーパーで買い物',
+        content: '牛乳を買う'
+      )
+      @re_task = FactoryBot.build(
+        :re_task, 
+        title: 'スーパーで買い物',
+        content: '野菜ジュースを買う'
+      )
+      
+      expect(@re_task.valid?).to eq(false)
+    end
+  end
 end
