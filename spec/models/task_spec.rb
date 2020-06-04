@@ -30,14 +30,15 @@ RSpec.describe Task, type: :model do
         :task, 
         title: 'スーパーで買い物',
         content: '牛乳を買う'
-      )
-      @re_task = FactoryBot.build(
-        :re_task, 
-        title: 'スーパーで買い物',
-        content: '野菜ジュースを買う'
-      )
-      
-      expect(@re_task.valid?).to eq(false)
+        )
+        @re_task = FactoryBot.build(
+          :re_task, 
+          title: 'スーパーで買い物',
+          content: '野菜ジュースを買う'
+          )
+          
+        expect(@re_task.valid?).to eq(false)
+        expect(@re_task.errors[:title]).to include("has already been taken")
     end
   end
 end
