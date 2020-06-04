@@ -30,7 +30,7 @@ RSpec.describe Task, type: :model do
         content: '牛乳を買う'
       )
       @re_task = FactoryBot.build(
-        :task, 
+        :re_task, 
         title: 'スーパーで買い物',
         content: '野菜ジュースを買う'
       )
