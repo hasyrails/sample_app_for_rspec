@@ -34,9 +34,14 @@ RSpec.describe "Users", type: :system do
       it 'can be edited' do
 
         editing_user = FactoryBot.create(:user)
-        edited_user = FactoryBot.build(:edited_user)
+        # editing_user = FactoryBot.build(:user)ではDB上にレコード登録されていないのでログイン情報として使用不可
 
+        # 編集するにはbefore_action :require_loginを通る必要がある
+
+        # ログイン画面へ遷移
         visit login_path
+
+        # ログイン情報を入力
         fill_in 'Email', with: editing_user.email
         fill_in 'Password', with: 'pwd'
         click_button 'Login'
@@ -44,7 +49,7 @@ RSpec.describe "Users", type: :system do
         visit edit_user_path(editing_user)
         sleep 1
 
-        fill_in 'Email', with: edited_user.email
+        fill_in 'Email', with: editing_user.email
         fill_in "Password", with: 'edited_pwd'
         fill_in 'Password confirmation', with: 'edited_pwd'
         
@@ -55,7 +60,9 @@ RSpec.describe "Users", type: :system do
         sleep 1
 
         expect(page).to have_content 'User was successfully updated.'
+
         expect(current_path).to eq user_path(editing_user)
+        # 編集前のユーザーファクトリをediting_user, 編集後のユーザーファクトリをedited_userと区別すると、idが異なってしまうため、詳細画面のパスエラー（ActionController::UrlGenerationError:No route matches）となる。区別する必要なし。
 
         sleep 1
       end
