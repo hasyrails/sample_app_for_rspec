@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe "Users", type: :system do
-  describe '#create' do
+  describe 'UsersController#create' do
     context 'user registration' do
       it 'can be created' do
         new_user = FactoryBot.build(:user)
@@ -29,7 +29,7 @@ RSpec.describe "Users", type: :system do
     end
   end
   
-  describe '#edit' do
+  describe 'UsersController#edit' do
     context 'editing user' do
       it 'can be edited' do
 
@@ -38,14 +38,10 @@ RSpec.describe "Users", type: :system do
 
         # 編集するにはbefore_action :require_loginを通る必要がある
 
-        # ログイン画面へ遷移
-        visit login_path
+        login(editing_user)
 
-        # ログイン情報を入力
-        fill_in 'Email', with: editing_user.email
-        fill_in 'Password', with: 'pwd'
-        click_button 'Login'
         sleep 3
+        
         visit edit_user_path(editing_user)
         sleep 1
 
