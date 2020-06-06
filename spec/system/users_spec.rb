@@ -64,4 +64,29 @@ RSpec.describe "Users", type: :system do
       end
     end
   end
+
+  describe 'login' do
+    context 'login success' do
+      it 'can login' do
+        login_user = FactoryBot.create(:user)
+
+        visit login_path
+        sleep 1
+
+        login(login_user)
+        sleep 1
+
+        # post '/login', params: { user: FactoryBot.attributes_for(:user) }
+        # post :create, params: { user: FactoryBot.attributes_for(:user) }
+        # No match routesエラーが起こる
+        
+        # follow_redirect!
+        # not a redirectエラー
+
+        expect(page).to have_content 'Login successful'
+        expect(current_path).to eq root_path
+
+      end
+    end
+  end
 end
