@@ -113,22 +113,62 @@ RSpec.describe "Users", type: :system do
       
       it 'fails to edit user' do
         user = FactoryBot.create(:user)
-
+        
         login(user)
         
         visit edit_user_path(user)
         sleep 1
-
+        
         fill_in 'Email', with: ''
         # 指定しない状態だと、予めフォームに入力されているメールアドレスがあるので空となっていない。
-
+        
         fill_in 'Password', with: 'edited_pwd'
         fill_in 'Password confirmation', with: 'edited_pwd'
         click_button 'Update'
         sleep 1
-
+        
         expect(page).to have_content "Email can't be blank"
         expect(current_path).to eq user_path(user)
+      end
+    end
+    
+    context 'when submit already registered email' do
+      it 'fails to create new user' do
+        user = FactoryBot.create(:user)
+        re_user = FactoryBot.build(:re_user)
+        
+        visit new_user_path
+        sleep 1
+        
+        fill_in 'Email', with: re_user.email
+        fill_in 'Password', with: 'pwd'
+        fill_in 'Password confirmation', with: 'pwd'
+        click_button 'SignUp'
+        sleep 1
+        
+        expect(page).to have_content "Email has already been taken"
+        expect(current_path).to eq users_path
+        
+        expect(User.all.size).to eq 1
+      end
+      
+      it 'fails to edit user' do
+        user = FactoryBot.create(:user)
+        re_user = FactoryBot.create(:re_user, email: 'hoge@example.com')
+        
+        login(re_user)
+        
+        visit edit_user_path(re_user)
+        sleep 1
+        
+        fill_in 'Email', with: user.email
+        fill_in 'Password', with: 'edited_pwd'
+        fill_in 'Password confirmation', with: 'edited_pwd'
+        click_button 'Update'
+        sleep 1
+        
+        expect(page).to have_content "Email has already been taken"
+        expect(current_path).to eq user_path(re_user)
       end
     end
   end
