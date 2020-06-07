@@ -203,4 +203,18 @@ RSpec.describe "Users", type: :system do
       end
     end
   end
+
+  describe 'require_login method test' do
+    context 'when not login' do
+      it 'cannot visit users/edit/:id' do
+        user = FactoryBot.create(:user)
+
+        visit user_path(user)
+        sleep 1
+        
+        expect(page).to have_content 'Login required'
+        expect(current_path).to eq login_path
+      end
+    end
+  end
 end

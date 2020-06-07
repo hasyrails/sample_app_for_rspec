@@ -109,16 +109,38 @@ RSpec.describe "Tasks", type: :system do
       # ===
     end
   end
+  # ※task編集成功のテストコードに関して
+  # task = FactoryBot.create(:task) で作成したタスクを編集することとすると、user_idが一致しないユーザーがアクセスすることとなるため、アクセスできない。
+  # taskファクトリにuser_idを指定したら可か？
+  # ====
+  # task = FactoryBot.create(:task)      
+  # visit edit_task_path(task)
+  # fill_in 'Title', with: 'ピアノ'
+  # select task.status, from: 'Status'
+  # sleep 1
+  # click_button 'Update Task'    
+  # ===
+
+  describe 'require_login method test' do
+    context 'when not login' do
+      it 'cannot visit tasks/new' do
+        visit new_task_path
+        sleep 1
+        
+        expect(page).to have_content 'Login required'
+        expect(current_path).to eq login_path
+      end
+
+      it 'cannot visit tasks/edit/:id' do
+        task = FactoryBot.create(:task)
+        visit edit_task_path(task)
+        sleep 1
+
+        expect(page).to have_content 'Login required'
+        expect(current_path).to eq login_path
+      end
+    end
+  end
+
 end
 
-# ※task編集成功のテストコードに関して
-# task = FactoryBot.create(:task) で作成したタスクを編集することとすると、user_idが一致しないユーザーがアクセスすることとなるため、アクセスできない。
-# taskファクトリにuser_idを指定したら可か？
-# ====
-# task = FactoryBot.create(:task)      
-# visit edit_task_path(task)
-# fill_in 'Title', with: 'ピアノ'
-# select task.status, from: 'Status'
-# sleep 1
-# click_button 'Update Task'    
-# ===
