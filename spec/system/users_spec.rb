@@ -92,21 +92,43 @@ RSpec.describe "Users", type: :system do
   end
 
   #異常系
-  describe 'user attribute validation' do
+  describe "user's email validation" do
     context 'when email is blank' do
       it 'fails to registate new user' do
         user = FactoryBot.build(:user)
 
         visit new_user_path
-
+        sleep 1
+        
         fill_in 'Password', with: 'pwd'
         fill_in 'Password confirmation', with: 'pwd'
         click_button 'SignUp'
+        sleep 1
 
         expect(page).to have_content "Email can't be blank"
         expect(current_path).to eq users_path
-
+        
         expect(User.all.size).to eq 0
+      end
+      
+      it 'fails to edit user' do
+        user = FactoryBot.create(:user)
+
+        login(user)
+        
+        visit edit_user_path(user)
+        sleep 1
+
+        fill_in 'Email', with: ''
+        # 指定しない状態だと、予めフォームに入力されているメールアドレスがあるので空となっていない。
+
+        fill_in 'Password', with: 'edited_pwd'
+        fill_in 'Password confirmation', with: 'edited_pwd'
+        click_button 'Update'
+        sleep 1
+
+        expect(page).to have_content "Email can't be blank"
+        expect(current_path).to eq user_path(user)
       end
     end
   end
