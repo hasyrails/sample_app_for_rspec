@@ -105,6 +105,8 @@ RSpec.describe "Users", type: :system do
 
         expect(page).to have_content "Email can't be blank"
         expect(current_path).to eq users_path
+
+        expect(User.all.size).to eq 0
       end
     end
   end
