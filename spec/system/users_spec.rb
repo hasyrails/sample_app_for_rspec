@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe "Users", type: :system do
+  # 正常系
   describe 'UsersController#create' do
     context 'user registration' do
       it 'can be created' do
@@ -86,6 +87,24 @@ RSpec.describe "Users", type: :system do
         expect(page).to have_content 'Login successful'
         expect(current_path).to eq root_path
 
+      end
+    end
+  end
+
+  #異常系
+  describe 'user attribute validation' do
+    context 'when email is blank' do
+      it 'fails to registate new user' do
+        user = FactoryBot.build(:user)
+
+        visit new_user_path
+
+        fill_in 'Password', with: 'pwd'
+        fill_in 'Password confirmation', with: 'pwd'
+        click_button 'SignUp'
+
+        expect(page).to have_content "Email can't be blank"
+        expect(current_path).to eq users_path
       end
     end
   end
