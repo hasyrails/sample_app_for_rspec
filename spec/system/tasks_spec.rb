@@ -1,6 +1,27 @@
 require 'rails_helper'
 
 RSpec.describe "Tasks", type: :system do
+  describe '#index' do
+    it 'populates an array of tasks created by login-user' do
+      # ログインする
+      login_user = FactoryBot.create(:user) # id=1のuser
+      login(login_user)
+      sleep 1
+
+      # login_userが作成したタスクを用意
+      task_by_login_user = FactoryBot.create(:task, user_id: 1)
+    
+      visit tasks_path
+      sleep 1
+
+      # ログインしたユーザーが作成したタスクが表示されているか
+      expect(page).to have_content task_by_login_user.title
+      expect(page).to have_content task_by_login_user.content
+      expect(page).to have_content task_by_login_user.status
+      expect(page).to have_content task_by_login_user.deadline.strftime('%Y/%-m/%-d %-H:%-M')
+    end
+  end
+
   describe '#create' do
     it 'can create a new task' do
       # ログインする
