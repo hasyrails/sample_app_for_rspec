@@ -217,4 +217,20 @@ RSpec.describe "Users", type: :system do
       end
     end
   end
+  
+  describe '#verify_access' do
+    it 'cannot edit other user' do
+      user = FactoryBot.create(:user)
+      other_user = FactoryBot.create(:other_user)
+      
+      login(other_user)
+      sleep 1
+
+      visit edit_user_path(user)
+      sleep 1
+
+      expect(page).to have_content 'Forbidden access.'
+      expect(current_path).to eq user_path(other_user)
+      end
+  end
 end

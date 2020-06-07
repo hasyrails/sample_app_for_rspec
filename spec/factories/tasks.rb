@@ -11,7 +11,7 @@ FactoryBot.define do
       factory: :user,
       email: 'test1@example.com'
   end
-    
+
   factory :re_task, class: Task do
     title { 'ランニング' }
     content { 'A公園' }

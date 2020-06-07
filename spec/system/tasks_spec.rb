@@ -142,5 +142,20 @@ RSpec.describe "Tasks", type: :system do
     end
   end
 
+  describe '#verify_access' do
+    it 'cannot edit other task' do
+      other_user = FactoryBot.create(:other_user)
+      task = FactoryBot.create(:task)
+      
+      login(other_user)
+      sleep 1
+
+      visit edit_task_path(task)
+      sleep 1
+
+      expect(page).to have_content 'Forbidden access.'
+      expect(current_path).to eq root_path
+      end
+  end
 end
 
