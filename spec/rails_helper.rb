@@ -65,4 +65,7 @@ RSpec.configure do |config|
 
   # カスタムモジュールLoginModuleの読込
   config.include LoginModule
+
+  # 省略記法を用いる
+  config.include FactoryBot::Syntax::Methods
 end
