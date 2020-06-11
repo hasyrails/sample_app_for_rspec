@@ -39,10 +39,20 @@ RSpec.describe 'UserSessions', type: :system do
       end
     end
   end
- 
+  
   describe 'ログイン後' do
     context 'ログアウトボタンをクリック' do
       it 'ログアウト処理が成功する' do 
+        user = FactoryBot.create(:user)
+        
+        login(user)
+        
+        click_link 'Logout'
+        sleep 1
+
+        expect(page).to have_content 'Logged out'
+        expect(current_path).to eq root_path
+        sleep 1
       end
     end
   end
