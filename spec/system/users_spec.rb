@@ -5,12 +5,12 @@ RSpec.describe 'Users', type: :system do
     describe 'ユーザー新規登録' do
       context 'フォームの入力値が正常' do
         it 'ユーザーの新規作成が成功する' do
-          new_user = FactoryBot.build(:user)
+          user = build(:user)
 
           visit new_user_path
           sleep 1
 
-          fill_in 'Email', with: new_user.email
+          fill_in 'Email', with: user.email
           fill_in "Password", with: 'password'
           # fill_in "Password", with: new_user.password では入力されない
           # sorceryでは「password」はvirtual attribute(DBに存在しない)→ActiveRecordメソッドで呼び出せない。
@@ -31,7 +31,7 @@ RSpec.describe 'Users', type: :system do
 
       context 'メールアドレスが未入力' do
         it 'ユーザーの新規作成が失敗する' do
-          user = FactoryBot.build(:user)
+          user = build(:user)
 
           visit new_user_path
           sleep 1
@@ -50,8 +50,8 @@ RSpec.describe 'Users', type: :system do
 
       context '登録済のメールアドレスを使用' do
         it 'ユーザーの新規作成が失敗する' do
-          user = FactoryBot.create(:user)
-          re_user = FactoryBot.build(:re_user)
+          user = create(:user)
+          re_user = build(:user)
         
           visit new_user_path
           sleep 1
@@ -74,7 +74,7 @@ RSpec.describe 'Users', type: :system do
     describe 'マイページ' do
       context 'ログインしていない状態' do
         it 'マイページへのアクセスが失敗する' do
-          user = FactoryBot.create(:user)
+          user = create(:user)
 
           visit user_path(user)
           sleep 1
@@ -90,7 +90,7 @@ RSpec.describe 'Users', type: :system do
       context 'フォームの入力値が正常' do
         it 'ユーザーの編集が成功する' do
           
-          editing_user = FactoryBot.create(:user)
+          editing_user = create(:user)
           # editing_user = FactoryBot.build(:user)ではDB上にレコード登録されていないのでログイン情報として使用不可
 
           # 編集するにはbefore_action :require_loginを通る必要がある
@@ -126,7 +126,7 @@ RSpec.describe 'Users', type: :system do
 
       context 'メールアドレスが未入力' do
         it 'ユーザーの編集が失敗する' do 
-          user = FactoryBot.create(:user)
+          user = create(:user)
         
           login(user)
           
@@ -148,8 +148,8 @@ RSpec.describe 'Users', type: :system do
 
       context '登録済のメールアドレスを使用' do
         it 'ユーザーの編集が失敗する' do
-          user = FactoryBot.create(:user)
-          re_user = FactoryBot.create(:re_user, email: 'hoge@example.com')
+          user = create(:user)
+          re_user = create(:re_user, email: 'hoge@example.com')
           
           login(re_user)
           
@@ -169,8 +169,8 @@ RSpec.describe 'Users', type: :system do
 
       context '他ユーザーの編集ページにアクセス' do
         it '編集ページへのアクセスが失敗する' do
-          user = FactoryBot.create(:user)
-          other_user = FactoryBot.create(:other_user)
+          user = create(:user)
+          other_user = create(:other_user)
       
           login(other_user)
           sleep 1
@@ -187,12 +187,12 @@ RSpec.describe 'Users', type: :system do
       context 'タスクを作成' do
         it '新規作成したタスクが表示される' do
           # ログインする
-          login_user = FactoryBot.create(:user) # id=1のuser
-          login(login_user)
+          user = create(:user) # id=1のuser
+          login(user)
           sleep 1
 
           # login_userが作成したタスクを用意
-          task_by_login_user = FactoryBot.create(:task, user_id: 1)
+          task_by_login_user = create(:task, user_id: 1)
     
           visit tasks_path
           sleep 1
