@@ -155,7 +155,7 @@ RSpec.describe "Tasks", type: :system do
 
       expect(page).to have_content 'Forbidden access.'
       expect(current_path).to eq root_path
-      end
+    end
   end
 end
 
