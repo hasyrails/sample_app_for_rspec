@@ -1,91 +1,182 @@
 require 'rails_helper'
 
-RSpec.describe "Users", type: :system do
-  describe 'UsersController#create' do
-    context 'user registration' do
-      it 'can be created' do
-        new_user = FactoryBot.build(:user)
+RSpec.describe 'Users', type: :system do  
+  describe 'ログイン前' do
+    let(:user) { build(:user) }
+    let(:other_user) { build(:user)}
+    describe 'ユーザー新規登録' do
+    before do
+      visit new_user_path
+      sleep 1
+    end
+      context 'フォームの入力値が正常' do     
+        it 'ユーザーの新規作成が成功する' do
+          fill_in 'Email', with: user.email
+          fill_in "Password", with: 'password'
+          fill_in 'Password confirmation', with: 'password'
+          sleep 1
+          
+          click_button 'SignUp'
+          sleep 1
+          
+          expect(page).to have_content 'User was successfully created.'
+          expect(current_path).to eq login_path
+          sleep 1
+        end
+      end
+      
+      context 'メールアドレスが未入力' do
+        it 'ユーザーの新規作成が失敗する' do
+          fill_in 'Password', with: 'password'
+          fill_in 'Password confirmation', with: 'password'
+          click_button 'SignUp'
+          sleep 1
+          
+          expect(page).to have_content "Email can't be blank"
+          expect(current_path).to eq users_path
+          expect(User.all.size).to eq 0
+          sleep 1
+        end
+      end
+      
+      context '登録済のメールアドレスを使用' do
+        it 'ユーザーの新規作成が失敗する' do
+          fill_in 'Email', with: user.email
+          fill_in 'Password', with: 'password'
+          fill_in 'Password confirmation', with: 'password'
+          click_button 'SignUp'
+          sleep 1
+          
+          click_on 'SignUp'
+          sleep 1
 
-        visit new_user_path
+          fill_in 'Email', with: user.email
+          fill_in 'Password', with: 'password'
+          fill_in 'Password confirmation', with: 'password'
+          click_button 'SignUp'
+          sleep 1
+          
+          expect(page).to have_content "Email has already been taken"
+          expect(current_path).to eq users_path
+          expect(User.all.size).to eq 1
+          sleep 1
+        end
+      end
+    end
+    
+    describe 'マイページ' do
+      let(:user) { create(:user) }
+      before do
+        visit user_path(user)
         sleep 1
-
-        fill_in 'Email', with: new_user.email
-        fill_in "Password", with: 'pwd'
-        # fill_in "Password", with: new_user.password では入力されない
-        # sorceryでは「password」はvirtual attribute(DBに存在しない)→ActiveRecordメソッドで呼び出せない。
-        fill_in 'Password confirmation', with: 'pwd'
-        # fill_in "Password confirmation", with: new_user.password_confirmation では入力されない
-        # sorceryでは「password_confirmation」はvirtual attribute(DBに存在しない)→ActiveRecordメソッドで呼び出せない。
-        
-        sleep 1
-
-        click_button 'SignUp'
-
-        sleep 1
-
-        expect(page).to have_content 'User was successfully created.'
-        expect(current_path).to eq login_path
+      end
+      context 'ログインしていない状態' do
+        it 'マイページへのアクセスが失敗する' do
+          expect(page).to have_content 'Login required'
+          expect(current_path).to eq login_path
+        end
       end
     end
   end
   
-  describe 'UsersController#edit' do
-    context 'editing user' do
-      it 'can be edited' do
+  describe 'ログイン後' do
+  let(:user) { create(:user) }
+  let(:other_user) { create(:user) }
+  let(:task) { build(:task) }
+  before do
+    login(user)
+  end
+  
+    describe 'ユーザー編集' do
+    before do
+      visit user_path(user)
+      click_on 'Edit'
+      sleep 1
+    end
 
-        editing_user = FactoryBot.create(:user)
-        # editing_user = FactoryBot.build(:user)ではDB上にレコード登録されていないのでログイン情報として使用不可
+      context 'フォームの入力値が正常' do
+        it 'ユーザーの編集が成功する' do
+          fill_in 'Email', with: user.email
+          fill_in "Password", with: 'edited_pwd'
+          fill_in 'Password confirmation', with: 'edited_pwd'
+          sleep 1
+          
+          click_button 'Update'
+          sleep 1
 
-        # 編集するにはbefore_action :require_loginを通る必要がある
+          expect(page).to have_content 'User was successfully updated.'
 
-        login(editing_user)
+          expect(current_path).to eq user_path(user)
+          sleep 1
+        end
+      end
 
-        sleep 3
-        
-        visit edit_user_path(editing_user)
-        sleep 1
+      context 'メールアドレスが未入力' do
+        it 'ユーザーの編集が失敗する' do 
+          fill_in 'Email', with: ''
+          # 指定しない状態だと、予めフォームに入力されているメールアドレスがあるので空となっていない。
+          
+          fill_in 'Password', with: 'edited_pwd'
+          fill_in 'Password confirmation', with: 'edited_pwd'
+          click_button 'Update'
+          sleep 1
+          
+          expect(page).to have_content "Email can't be blank"
+          expect(current_path).to eq user_path(user)
+        end
+      end
 
-        fill_in 'Email', with: editing_user.email
-        fill_in "Password", with: 'edited_pwd'
-        fill_in 'Password confirmation', with: 'edited_pwd'
-        
-        sleep 1
-
-        click_button 'Update'
-
-        sleep 1
-
-        expect(page).to have_content 'User was successfully updated.'
-
-        expect(current_path).to eq user_path(editing_user)
-        # 編集前のユーザーファクトリをediting_user, 編集後のユーザーファクトリをedited_userと区別すると、idが異なってしまうため、詳細画面のパスエラー（ActionController::UrlGenerationError:No route matches）となる。区別する必要なし。
-
-        sleep 1
+      context '登録済のメールアドレスを使用' do
+        it 'ユーザーの編集が失敗する' do
+          fill_in 'Email', with: other_user.email
+          fill_in 'Password', with: 'password'
+          fill_in 'Password confirmation', with: 'password'
+          click_button 'Update'
+          sleep 1
+          
+          expect(page).to have_content "Email has already been taken"
+          expect(current_path).to eq user_path(user)
+        end
       end
     end
-  end
 
-  describe 'login' do
-    context 'login success' do
-      it 'can login' do
-        login_user = FactoryBot.create(:user)
+      context '他ユーザーの編集ページにアクセス' do
+        it '編集ページへのアクセスが失敗する' do
+          login(other_user)
+          sleep 1
 
-        visit login_path
-        sleep 1
+          visit edit_user_path(user)
+          sleep 1
 
-        login(login_user)
-        sleep 1
-
-        # post '/login', params: { user: FactoryBot.attributes_for(:user) }
-        # post :create, params: { user: FactoryBot.attributes_for(:user) }
-        # No match routesエラーが起こる
+          expect(page).to have_content 'Forbidden access.'
+          expect(current_path).to eq user_path(other_user)
+        end
+      end
+    
+      
+    describe 'マイページ' do
+    before do
+      visit new_task_path
+    end
         
-        # follow_redirect!
-        # not a redirectエラー
-
-        expect(page).to have_content 'Login successful'
-        expect(current_path).to eq root_path
-
+      context 'タスクを作成' do
+        it '新規作成したタスクが表示される' do
+          
+          fill_in 'Title', with: task.title
+          fill_in 'Content', with: task.content
+          select task.status, from: 'task_status'
+          fill_in 'Deadline', with: task.deadline
+          click_on 'Create Task'
+          
+          visit tasks_path
+          sleep 1
+          
+          # ログインしたユーザーが作成したタスクが表示されているか
+          expect(page).to have_content task.title
+          expect(page).to have_content task.content
+          expect(page).to have_content task.status
+          expect(page).to have_content task.deadline.strftime('%Y/%-m/%-d %-H:%-M')
+        end
       end
     end
   end

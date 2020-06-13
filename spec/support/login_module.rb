@@ -5,7 +5,7 @@ module LoginModule
 
     # ログイン情報を入力
     fill_in 'Email', with: user.email
-    fill_in 'Password', with: 'pwd'
+    fill_in 'Password', with: 'password'
 
     # ログイン情報を送信
     click_button 'Login'
