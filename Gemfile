@@ -34,4 +34,10 @@ group :development do
   gem 'rails_best_practices'
 end
 
+group :test do
+  gem 'capybara', '~> 3.28'
+  gem 'selenium-webdriver', '~> 3.142'
+  gem 'webdrivers', '~> 4.1'
+end
+
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
