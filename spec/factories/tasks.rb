@@ -1,23 +1,9 @@
 FactoryBot.define do
-  factory :task, class: Task do
-    title { 'ランニング' }
-    content { 'A公園' }
-    status { 0 }
-    deadline { '2020-6-20 7:00' }
-    
-    association :user,
-      factory: :user,
-      email: 'test1@example.com'
-    end
-    
-    factory :re_task, class: Task do
-      title { 'ランニング' }
-      content { 'A公園' }
-      status { 0 }
-      deadline { '2020-6-20 7:00' }
-      
-      association :user,
-        factory: :user,
-        email: 'test2@example.com'
+  factory :task do
+    sequence(:title) { |n| "title#{n}" }
+    content { 'content' }
+    status {:todo}
+    deadline { 1.week.from_now.strftime('%Y/%-m/%-d %-H:%-M') }
+    association :user
   end
 end
